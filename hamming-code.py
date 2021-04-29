@@ -87,31 +87,15 @@ def is_valid(combination):
 
 
 def fix_corrupted(number, error_bits):
-    # get parity bits
-    parity_bits = get_parity_bits_positions(number)
-    controlled_bits_indices = []
-    for i in error_bits:
-        if i in parity_bits:
-            # get controlled bits indices for each parity bit
-            _, indices = get_controlled_bits(number, parity_bits, parity_bits.index(i))
-            controlled_bits_indices.append(indices)
+    # get the index of a corrupted info bit
+    corrupted_index = 1
+    for error in error_bits:
+        corrupted_index += error
 
-    # find common controlled bits for the corrupted parity bits
-    common_bits_indices = set(controlled_bits_indices[0])
-    for i in range(len(controlled_bits_indices)):
-        common_bits_indices = common_bits_indices.intersection(controlled_bits_indices[i])
-    common_bits_indices = sorted(list(common_bits_indices))
-
-    is_fixed = False
-    while not is_fixed:
-        for index in common_bits_indices:
-            fixed = number
-            # brute force
-            fixed[index] = 1 if index == 0 else 0
-            if is_valid(fixed):
-                print(f'fixed code               {trim(fixed)}')
-                is_fixed = True
-                break
+    # invert the corrupted bit
+    number[corrupted_index] = 1 if number[corrupted_index] == 0 else 0
+    if is_valid(number):
+        print(f'fixed code               {trim(number)}')
 
 
 if __name__ == '__main__':
